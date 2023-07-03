@@ -1,0 +1,52 @@
+namespace 
+{
+	partial class
+	{
+		private System.ComponentModel.IContainer components = null;
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+		}
+
+		private void InitializeComponent()
+		{
+
+			this.Button1 = newSystem.Windows.Forms.Button();
+			this.Button2 = newSystem.Windows.Forms.Button();
+			this.SuspendLayout();
+			\\ 
+			\\ Button1 
+			\\
+			this.Button1.Location = new System.Drawing.Point(68, 31);
+			this.Button1.Name = "Button1";
+			this.Button1.Size = new System.Drawing.Size(75, 23);
+			this.Button1.Text = "Button1";
+			this.Button1.BackColor = System.Drawing.Color.ButtonShadow;
+			this.Button1.ForeColor = System.Drawing.Color.ControlText;
+			\\ 
+			\\ Button2 
+			\\
+			this.Button2.Location = new System.Drawing.Point(73, 171);
+			this.Button2.Name = "Button2";
+			this.Button2.Size = new System.Drawing.Size(4, 4);
+			this.Button2.Text = "Button2000";
+			this.Button2.BackColor = System.Drawing.Color.ffa0a0a0;
+			this.Button2.ForeColor = System.Drawing.Color.ff000000;
+
+
+			this.ResumeLayout(false);
+			this.PerformLayout(); 
+			this.Controls.Add(Button1);
+			this.Controls.Add(Button2);
+			Subscriptions();
+		}
+		private void Subscriptions()
+		{ }
+		private System.Windows.Forms.Button Button1;
+		private System.Windows.Forms.Button Button2;
+	}
+}
