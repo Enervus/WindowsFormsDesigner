@@ -50,7 +50,11 @@ namespace WindowsFormsDesigner
             this.deleteButton = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.open_button = new System.Windows.Forms.Button();
+            this.widthNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.heightNumericUpDown = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.widthNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.heightNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -141,9 +145,9 @@ namespace WindowsFormsDesigner
             // 
             // textBoxWidth
             // 
-            this.textBoxWidth.Location = new System.Drawing.Point(74, 266);
+            this.textBoxWidth.Location = new System.Drawing.Point(59, 266);
             this.textBoxWidth.Name = "textBoxWidth";
-            this.textBoxWidth.Size = new System.Drawing.Size(83, 20);
+            this.textBoxWidth.Size = new System.Drawing.Size(79, 20);
             this.textBoxWidth.TabIndex = 7;
             this.textBoxWidth.Text = "800";
             this.textBoxWidth.TextChanged += new System.EventHandler(this.textBoxWidth_TextChanged);
@@ -153,7 +157,7 @@ namespace WindowsFormsDesigner
             this.textBox4.Enabled = false;
             this.textBox4.Location = new System.Drawing.Point(5, 266);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(59, 20);
+            this.textBox4.Size = new System.Drawing.Size(48, 20);
             this.textBox4.TabIndex = 8;
             this.textBox4.Text = "Width";
             // 
@@ -162,15 +166,15 @@ namespace WindowsFormsDesigner
             this.textBox5.Enabled = false;
             this.textBox5.Location = new System.Drawing.Point(6, 292);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(59, 20);
+            this.textBox5.Size = new System.Drawing.Size(47, 20);
             this.textBox5.TabIndex = 8;
             this.textBox5.Text = "Height";
             // 
             // textBoxHeight
             // 
-            this.textBoxHeight.Location = new System.Drawing.Point(71, 292);
+            this.textBoxHeight.Location = new System.Drawing.Point(59, 292);
             this.textBoxHeight.Name = "textBoxHeight";
-            this.textBoxHeight.Size = new System.Drawing.Size(83, 20);
+            this.textBoxHeight.Size = new System.Drawing.Size(79, 20);
             this.textBoxHeight.TabIndex = 7;
             this.textBoxHeight.Text = "600";
             this.textBoxHeight.TextChanged += new System.EventHandler(this.textBoxHeight_TextChanged);
@@ -202,7 +206,7 @@ namespace WindowsFormsDesigner
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(144, 153);
+            this.numericUpDown1.Location = new System.Drawing.Point(144, 152);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -234,12 +238,72 @@ namespace WindowsFormsDesigner
             this.open_button.UseVisualStyleBackColor = true;
             this.open_button.Click += new System.EventHandler(this.open_button_Click);
             // 
+            // widthNumericUpDown
+            // 
+            this.widthNumericUpDown.Increment = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.widthNumericUpDown.Location = new System.Drawing.Point(144, 266);
+            this.widthNumericUpDown.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.widthNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.widthNumericUpDown.Name = "widthNumericUpDown";
+            this.widthNumericUpDown.Size = new System.Drawing.Size(18, 20);
+            this.widthNumericUpDown.TabIndex = 12;
+            this.widthNumericUpDown.Value = new decimal(new int[] {
+            800,
+            0,
+            0,
+            0});
+            this.widthNumericUpDown.Visible = false;
+            this.widthNumericUpDown.ValueChanged += new System.EventHandler(this.widthNumericUpDown_ValueChanged);
+            // 
+            // heightNumericUpDown
+            // 
+            this.heightNumericUpDown.Increment = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.heightNumericUpDown.Location = new System.Drawing.Point(144, 292);
+            this.heightNumericUpDown.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.heightNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.heightNumericUpDown.Name = "heightNumericUpDown";
+            this.heightNumericUpDown.Size = new System.Drawing.Size(18, 20);
+            this.heightNumericUpDown.TabIndex = 14;
+            this.heightNumericUpDown.Value = new decimal(new int[] {
+            800,
+            0,
+            0,
+            0});
+            this.heightNumericUpDown.Visible = false;
+            this.heightNumericUpDown.ValueChanged += new System.EventHandler(this.heightNumericUpDown_ValueChanged);
+            // 
             // FormEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 621);
+            this.Controls.Add(this.heightNumericUpDown);
             this.Controls.Add(this.open_button);
+            this.Controls.Add(this.widthNumericUpDown);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.deleteButton);
             this.Controls.Add(this.allElementsBox);
@@ -259,6 +323,8 @@ namespace WindowsFormsDesigner
             this.Text = "FormEditor";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.widthNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.heightNumericUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -286,6 +352,8 @@ namespace WindowsFormsDesigner
         private System.Windows.Forms.Button deleteButton;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button open_button;
+        private System.Windows.Forms.NumericUpDown widthNumericUpDown;
+        private System.Windows.Forms.NumericUpDown heightNumericUpDown;
     }
 }
 
