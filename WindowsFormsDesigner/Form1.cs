@@ -186,7 +186,7 @@ namespace WindowsFormsDesigner
                             {
                                 writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".BackColor = System.Drawing.SystemColors.", control.BackColor.Name.ToString(), ";"));
                             }
-                            if (!control.BackColor.IsSystemColor)
+                            if (!control.ForeColor.IsSystemColor)
                             {
                                 writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.Color.", control.ForeColor.Name.ToString(), ";"));
                             }
@@ -194,14 +194,13 @@ namespace WindowsFormsDesigner
                             {
                                 writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.SystemColors.", control.ForeColor.Name.ToString(), ";"));
                             }
-                            //writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.Color.", control.ForeColor.Name.ToString(), ");"));
                         }
                         writer.WriteLine(string.Concat("\t\t\t// \n" +
                                 "\t\t\t// ", cl_str, " \n" +
                                 "\t\t\t//"));
 
                         writer.WriteLine(string.Concat("\t\t\tthis.AutoScaleDimensions = new System.Drawing.SizeF(",
-                              AutoScaleDimensions.Width.ToString(), ", ", AutoScaleDimensions.Height.ToString(), ");"));
+                              AutoScaleDimensions.Width.ToString(), "F, ", AutoScaleDimensions.Height.ToString(), "F);"));
                         writer.WriteLine(string.Concat("\t\t\tthis.AutoScaleMode = System.Windows.Forms.AutoScaleMode.",
                               AutoScaleMode.ToString(), ";"));
                         writer.WriteLine(string.Concat("\t\t\tthis.ClientSize = new System.Drawing.Size(",
@@ -677,8 +676,8 @@ namespace WindowsFormsDesigner
             else if (field.Name == "AutoScaleDimensions")
             {
                 Match match1 = Regex.Match(input, @"System\.Drawing\.SizeF\((.*?)F,(.*?)F\)");
-                float width = Convert.ToInt32(match1.Groups[1].ToString());
-                float height = Convert.ToInt32(match1.Groups[2].ToString());
+                float width = Convert.ToSingle(match1.Groups[1].ToString());
+                float height = Convert.ToSingle(match1.Groups[2].ToString());
                 form.AutoScaleDimensions = new SizeF(width, height);
             }
             else if (field.Name == "AutoScaleMode")

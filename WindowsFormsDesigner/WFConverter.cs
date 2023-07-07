@@ -97,8 +97,11 @@ namespace WindowsFormsDesigner
                 }
             }
 
-
-            return Color.FromArgb(numbers[0], numbers[1], numbers[2]);
+            if (text.Length >= 3)
+            {
+                return Color.FromArgb(numbers[0], numbers[1], numbers[2]);
+            }
+            return Color.FromName(text[0]);
         }
 
         public static string FromColor(Color color)
@@ -106,7 +109,7 @@ namespace WindowsFormsDesigner
             string text = "";
             if (color != null)
             {
-                text = string.Concat(color.R.ToString(), ",", color.G.ToString(), ",", color.B.ToString());
+                text = color.Name;
             }
 
             return text;
