@@ -62,7 +62,7 @@ namespace WindowsFormsDesigner
             this.panel1.BackColor = System.Drawing.SystemColors.ButtonShadow;
             this.panel1.Location = new System.Drawing.Point(180, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(796, 612);
+            this.panel1.Size = new System.Drawing.Size(800, 600);
             this.panel1.TabIndex = 0;
             this.panel1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseClick);
             // 
@@ -240,11 +240,6 @@ namespace WindowsFormsDesigner
             // 
             // widthNumericUpDown
             // 
-            this.widthNumericUpDown.Increment = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
             this.widthNumericUpDown.Location = new System.Drawing.Point(144, 266);
             this.widthNumericUpDown.Maximum = new decimal(new int[] {
             10000,
@@ -252,7 +247,7 @@ namespace WindowsFormsDesigner
             0,
             0});
             this.widthNumericUpDown.Minimum = new decimal(new int[] {
-            1,
+            160,
             0,
             0,
             0});
@@ -264,16 +259,10 @@ namespace WindowsFormsDesigner
             0,
             0,
             0});
-            this.widthNumericUpDown.Visible = false;
             this.widthNumericUpDown.ValueChanged += new System.EventHandler(this.widthNumericUpDown_ValueChanged);
             // 
             // heightNumericUpDown
             // 
-            this.heightNumericUpDown.Increment = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
             this.heightNumericUpDown.Location = new System.Drawing.Point(144, 292);
             this.heightNumericUpDown.Maximum = new decimal(new int[] {
             10000,
@@ -281,7 +270,7 @@ namespace WindowsFormsDesigner
             0,
             0});
             this.heightNumericUpDown.Minimum = new decimal(new int[] {
-            1,
+            160,
             0,
             0,
             0});
@@ -293,7 +282,6 @@ namespace WindowsFormsDesigner
             0,
             0,
             0});
-            this.heightNumericUpDown.Visible = false;
             this.heightNumericUpDown.ValueChanged += new System.EventHandler(this.heightNumericUpDown_ValueChanged);
             // 
             // FormEditor
@@ -302,8 +290,8 @@ namespace WindowsFormsDesigner
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 621);
             this.Controls.Add(this.heightNumericUpDown);
-            this.Controls.Add(this.open_button);
             this.Controls.Add(this.widthNumericUpDown);
+            this.Controls.Add(this.open_button);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.deleteButton);
             this.Controls.Add(this.allElementsBox);

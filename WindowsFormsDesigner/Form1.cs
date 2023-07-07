@@ -1,35 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.CodeDom;
-using System.CodeDom.Compiler;
-using System.Reflection;
-using Microsoft.CSharp;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace WindowsFormsDesigner
 {
     public partial class FormEditor : Form
     {
-        static CodeDomProvider provider;
         Type elementType = null;
         Control selectedElement = null;
 
         string FileDirectory;
         BuildForm buildForm = new BuildForm();
 
+        string subscriptions = "";
+
         public FormEditor()
         {
             InitializeComponent();
-            provider = new CSharpCodeProvider();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -83,7 +76,7 @@ namespace WindowsFormsDesigner
 
                     buildForm.Controls.Add(clone);
                     panel1.Controls.Add(control);
-                    
+
                     items.SelectedIndex = -1;
                     elementType = null;
                     selectedElement = control;
@@ -92,9 +85,9 @@ namespace WindowsFormsDesigner
 
                     allElementsBox.Items.Add(new CollectionItem(control));
                 }
-                if(e.Button == MouseButtons.Right)
+                if (e.Button == MouseButtons.Right)
                 {
-                    selectedElement = null; 
+                    selectedElement = null;
                     items.SelectedIndex = -1;
                     elementType = null;
                 }
@@ -109,20 +102,7 @@ namespace WindowsFormsDesigner
                 UpdateTextBoxParams();
             }
         }
-        private void LoadCustomForm(string formLocation)
-        {
-            string outputFile = "";
-            StreamReader reader = new StreamReader(formLocation);
-            while (!reader.EndOfStream)
-            {
-                string s = reader.ReadLine();
-                if (s.Contains("+="))
-                {
-                    outputFile += "//";
-                }
-                outputFile += s;
-            }
-        }
+
 
         private void SyncClone(Control main, Control clone)
         {
@@ -140,9 +120,9 @@ namespace WindowsFormsDesigner
         private Control FindClone(Control main)
         {
             Control clone = null;
-            foreach(Control control in buildForm.Controls)
+            foreach (Control control in buildForm.Controls)
             {
-                if(control.Name == main.Name)
+                if (control.Name == main.Name)
                 {
                     clone = control;
                 }
@@ -198,19 +178,38 @@ namespace WindowsFormsDesigner
                             writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".Size = new System.Drawing.Size(",
                                 control.Size.Width.ToString(), ", ", control.Size.Height.ToString(), ");"));
                             writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".Text = \"", control.Text, "\";"));
-                            writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".BackColor = System.Drawing.Color.FromArgb(", control.BackColor.ToArgb(),");"));
-                            writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.Color.FromArgb(", control.ForeColor.ToArgb(), ");"));
+                            if (!control.BackColor.IsSystemColor)
+                            {
+                                writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".BackColor = System.Drawing.Color.", control.BackColor.Name.ToString(), ";"));
+                            }
+                            else
+                            {
+                                writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".BackColor = System.Drawing.SystemColors.", control.BackColor.Name.ToString(), ";"));
+                            }
+                            if (!control.BackColor.IsSystemColor)
+                            {
+                                writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.Color.", control.ForeColor.Name.ToString(), ";"));
+                            }
+                            else
+                            {
+                                writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.SystemColors.", control.ForeColor.Name.ToString(), ";"));
+                            }
+                            //writer.WriteLine(string.Concat("\t\t\tthis.", control.Name, ".ForeColor = System.Drawing.Color.", control.ForeColor.Name.ToString(), ");"));
                         }
                         writer.WriteLine(string.Concat("\t\t\t// \n" +
                                 "\t\t\t// ", cl_str, " \n" +
-                                "\t\t\t//")) ;
+                                "\t\t\t//"));
+
                         writer.WriteLine(string.Concat("\t\t\tthis.AutoScaleDimensions = new System.Drawing.SizeF(",
-                              this.AutoScaleDimensions.Width.ToString(), ", ", this.AutoScaleDimensions.Height.ToString(), ");"));
+                              AutoScaleDimensions.Width.ToString(), ", ", AutoScaleDimensions.Height.ToString(), ");"));
                         writer.WriteLine(string.Concat("\t\t\tthis.AutoScaleMode = System.Windows.Forms.AutoScaleMode.",
-                              this.AutoScaleMode.ToString(), ";"));
+                              AutoScaleMode.ToString(), ";"));
                         writer.WriteLine(string.Concat("\t\t\tthis.ClientSize = new System.Drawing.Size(",
                                panel1.Size.Width.ToString(), ", ", panel1.Size.Height.ToString(), ");"));
-                      
+
+                        writer.WriteLine(string.Concat("\t\t\tthis.Name = ", buildForm.Name, ";\n"));
+                        writer.WriteLine(string.Concat("\t\t\tthis.Text = ", buildForm.Text, ";\n"));
+
                         writer.WriteLine("\n");
                         //Форма
                         writer.WriteLine("\t\t\tthis.ResumeLayout(false);\n" +
@@ -228,7 +227,7 @@ namespace WindowsFormsDesigner
                         writer.WriteLine("\t\t}");
 
                         //Метод с подписками
-                        writer.WriteLine("\t\tprivate void Subscriptions()\n\t\t{ }");
+                        writer.WriteLine(string.Concat("\t\tprivate void Subscriptions()\n\t\t{\n", subscriptions, "\t\t}"));
 
                         //Объявление элементов
                         foreach (Control control in buildForm.Controls)
@@ -240,22 +239,11 @@ namespace WindowsFormsDesigner
                 }
             }
         }
-        private CodeExpression ConcatString(CodeExpression left, CodeExpression middle, CodeExpression right)
-        {
-            return new CodeSnippetExpression(CodeToString(left) + " + " + CodeToString(middle) + " + " + CodeToString(right));
-        }
-        private string CodeToString(CodeExpression expr)
-        {
-            using (TextWriter tx = new StringWriter())
-            {
-                provider.GenerateCodeFromExpression(expr, tx, new CodeGeneratorOptions());
-                return tx.ToString();
-            }
-        }
-
 
         private void button1_Click(object sender, EventArgs e)
         {
+            panel1.Controls.Clear();
+            buildForm.Controls.Clear();
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = "c:\\";
@@ -295,7 +283,7 @@ namespace WindowsFormsDesigner
             try
             {
                 int number;
-                if(int.TryParse(textBoxWidth.Text, out number))
+                if (int.TryParse(textBoxWidth.Text, out number))
                 {
                     buildForm.ClientSize = new Size(number, buildForm.ClientSize.Height);
                     panel1.Size = new Size(number, buildForm.ClientSize.Height);
@@ -328,7 +316,7 @@ namespace WindowsFormsDesigner
             }
         }
 
-       
+
         private void UpdateTextBoxParams()
         {
             if (selectedElement != null)
@@ -365,11 +353,11 @@ namespace WindowsFormsDesigner
                 {
                     textBoxElement.Text = selectedElement.Text;
                 }
-                if(paramsItemBox.SelectedIndex == 6)
+                if (paramsItemBox.SelectedIndex == 6)
                 {
                     textBoxElement.Text = WFConverter.FromColor(selectedElement.BackColor);
                 }
-                if(paramsItemBox.SelectedIndex == 7)
+                if (paramsItemBox.SelectedIndex == 7)
                 {
                     textBoxElement.Text = WFConverter.FromColor(selectedElement.ForeColor);
                 }
@@ -377,13 +365,8 @@ namespace WindowsFormsDesigner
         }
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-           UpdateTextBoxParams();
-
+            UpdateTextBoxParams();
         }
-
-  
-
         private void textBoxElement_TextChanged(object sender, EventArgs e)
         {
             if (selectedElement != null)
@@ -391,9 +374,9 @@ namespace WindowsFormsDesigner
                 if (paramsItemBox.SelectedIndex == 0)
                 {
                     bool allowed = true;
-                    foreach(Control control in panel1.Controls)
+                    foreach (Control control in panel1.Controls)
                     {
-                        if(control.Name == textBoxElement.Text && control != selectedElement)
+                        if (control.Name == textBoxElement.Text && control != selectedElement)
                         {
                             allowed = false;
                             MessageBox.Show("Это имя уже занято!");
@@ -413,7 +396,7 @@ namespace WindowsFormsDesigner
                 if (paramsItemBox.SelectedIndex == 2)
                 {
                     selectedElement.Size = WFConverter.ToHeight(textBoxElement.Text, selectedElement);
-                } 
+                }
                 if (paramsItemBox.SelectedIndex == 3)
                 {
                     selectedElement.Location = WFConverter.ToPointX(textBoxElement.Text, selectedElement);
@@ -454,11 +437,11 @@ namespace WindowsFormsDesigner
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            if(selectedElement != null && buildForm != null)
+            if (selectedElement != null && buildForm != null)
             {
-                foreach(Control control in buildForm.Controls)
+                foreach (Control control in buildForm.Controls)
                 {
-                    if(control.Name == selectedElement.Name)
+                    if (control.Name == selectedElement.Name)
                     {
                         buildForm.Controls.Remove(control);
                         break;
@@ -467,7 +450,7 @@ namespace WindowsFormsDesigner
                 panel1.Controls.Remove(selectedElement);
                 foreach (CollectionItem control in allElementsBox.Items.OfType<CollectionItem>())
                 {
-                    if(control.Item == selectedElement)
+                    if (control.Item == selectedElement)
                     {
                         allElementsBox.Items.Remove(control);
                         break;
@@ -503,17 +486,17 @@ namespace WindowsFormsDesigner
             }
             else
             {
-                MessageBox.Show("Укажите путь",Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Укажите путь", Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private string FindNamespace(string locationForm)
         {
             string result = "";
-            using (FileStream stream = new FileStream(locationForm,FileMode.Open))
+            using (FileStream stream = new FileStream(locationForm, FileMode.Open))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    Match match = Regex.Match(reader.ReadToEnd(),"namespace (.*?){",RegexOptions.Singleline);
+                    Match match = Regex.Match(reader.ReadToEnd(), "namespace (.*?){", RegexOptions.Singleline);
                     result = match.Groups[1].ToString();
                 }
 
@@ -529,23 +512,6 @@ namespace WindowsFormsDesigner
                 {
                     Match match = Regex.Match(reader.ReadToEnd(), "class (.*?){", RegexOptions.Singleline);
                     result = match.Groups[1].ToString();
-                }
-
-            }
-            return result;
-        }
-        private string FindExpressions(string locationForm)
-        {
-            string result = "";
-            using (FileStream stream = new FileStream(locationForm, FileMode.Open))
-            {
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    Match match = Regex.Match(reader.ReadToEnd(), "(.*?) = (.*?);", RegexOptions.Singleline);
-                    for (int i = 1; i < match.Groups.Count; i += 2)
-                    {
-                        result += string.Concat(match.Groups[i].ToString(), " = ", match.Groups[i + 1].ToString());
-                    }
                 }
 
             }
@@ -629,10 +595,121 @@ namespace WindowsFormsDesigner
                     }
                 }
             }
+            using (FileStream stream = new FileStream(locationForm, FileMode.Open))
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        Match match = Regex.Match(reader.ReadLine(), @"this\.(.*?) = (.*?);", RegexOptions.Singleline);
+                        if (!match.Groups[3].ToString().Contains("()") && !match.Groups[1].ToString().Contains("."))
+                        {
+                            PropertyInfo[] fields = buildForm.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                            //PropertyInfo[] properties = control.GetType().GetProperties();
+
+                            string[] text = match.Groups[1].Value.GetType().ToString().Split('.');
+                            //  string name = text[text.Length - 1];
+                            string orig = match.Groups[1].Value.ToString();
+
+                            foreach (PropertyInfo field in fields)
+                            {
+                                if (field.Name == orig)
+                                {
+                                    string input = match.Groups[2].ToString();
+                                    string typeofcolor = orig;
+                                    SetFormProperties(input, typeofcolor, field, buildForm);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             InitializeSubscriptions(locationForm);
         }
+        private void SetFormProperties(string input, string type_of_color, PropertyInfo field, Form form)
+        {
+            if (input.Contains(".Point"))
+            {
+                Match match1 = Regex.Match(input, @"System.Drawing.Point\((.*?),(.*?)\)");
+                int x = Convert.ToInt32(match1.Groups[1].ToString());
+                int y = Convert.ToInt32(match1.Groups[2].ToString());
+                form.Location = new Point(x, y);
+            }
+            if (type_of_color.Contains("ForeColor") && input.Contains(".Color"))
+            {
+                string[] text = input.Split('.');
+                form.ForeColor = Color.FromName(text[text.Length - 1]);
+            }
+            if (type_of_color.Contains("BackColor") && input.Contains(".Color"))
+            {
+                string[] text = input.Split('.');
+                form.BackColor = Color.FromName(text[text.Length - 1]);
+            }
+            if (type_of_color.Contains("ForeColor") && input.Contains(".SystemColors"))
+            {
+                string[] text = input.Split('.');
+                form.ForeColor = Color.FromName(text[text.Length - 1]);
+            }
+            if (type_of_color.Contains("BackColor") && input.Contains(".SystemColors"))
+            {
+                string[] text = input.Split('.');
+                form.BackColor = Color.FromName(text[text.Length - 1]);
+            }
+
+            if (field.Name == "ClientSize")
+            {
+                Match match1 = Regex.Match(input, @"System\.Drawing\.Size\((.*?),(.*?)\)");
+                int width = Convert.ToInt32(match1.Groups[1].ToString());
+                int height = Convert.ToInt32(match1.Groups[2].ToString());
+                form.ClientSize = new Size(width, height);
+                panel1.Size = new Size(width, height);
+            }
+            else if (field.Name == "Name")
+            {
+                Match match1 = Regex.Match(input, "\"(.*?)\"");
+                form.Name = string.Concat("\"", match1.Groups[1].ToString().Replace("\"", ""), "\"");
+            }
+            else if (field.Name == "Text")
+            {
+                Match match1 = Regex.Match(input, "\"(.*?)\"");
+                form.Text = string.Concat("\"", match1.Groups[1].ToString().Replace("\"", ""), "\"");
+            }
+            else if (field.Name == "AutoScaleDimensions")
+            {
+                Match match1 = Regex.Match(input, @"System\.Drawing\.SizeF\((.*?)F,(.*?)F\)");
+                float width = Convert.ToInt32(match1.Groups[1].ToString());
+                float height = Convert.ToInt32(match1.Groups[2].ToString());
+                form.AutoScaleDimensions = new SizeF(width, height);
+            }
+            else if (field.Name == "AutoScaleMode")
+            {
+                //Match match1 = Regex.Match(input, @"System\.Windows\.Forms\.AutoScaleMode\.(.?*)");
+            }
+            else if (input.Contains(".Size"))
+            {
+                try
+                {
+                    string f = field.Name;
+                    Match match1 = Regex.Match(input, @"System.Drawing.Size\((.*?),(.*?)\)");
+                    int width = Convert.ToInt32(match1.Groups[1].ToString());
+                    int height = Convert.ToInt32(match1.Groups[2].ToString());
+                    form.Size = new Size(width, height);
+                    panel1.Size = new Size(width, height);
+                }
+                catch
+                {
+                    string f = field.Name;
+                }
+            }
+        }
+
         private void SetProperties(string input, string type_of_color, Control control)
         {
+            if (input.Contains("\""))
+            {
+                Match match1 = Regex.Match(input, "\"(.*?)\"");
+                control.Text = match1.Groups[1].ToString();
+            }
             if (input.Contains(".Size"))
             {
                 Match match1 = Regex.Match(input, @"System.Drawing.Size\((.*?),(.*?)\)");
@@ -649,59 +726,63 @@ namespace WindowsFormsDesigner
             }
             if (type_of_color.Contains("ForeColor") && input.Contains(".Color"))
             {
-                string[] text = input.Split('.');
+                string[] text = input.Split('.', ';');
                 control.ForeColor = Color.FromName(text[text.Length - 1]);
             }
             if (type_of_color.Contains("BackColor") && input.Contains(".Color"))
             {
-                string[] text = input.Split('.');
+                string[] text = input.Split('.', ';');
                 control.BackColor = Color.FromName(text[text.Length - 1]);
             }
             if (type_of_color.Contains("ForeColor") && input.Contains(".SystemColors"))
             {
-                string[] text = input.Split('.');
+                string[] text = input.Split('.', ';');
                 control.ForeColor = Color.FromName(text[text.Length - 1]);
             }
             if (type_of_color.Contains("BackColor") && input.Contains(".SystemColors"))
             {
-                string[] text = input.Split('.');
+                string[] text = input.Split('.', ';');
                 control.BackColor = Color.FromName(text[text.Length - 1]);
             }
         }
 
         private void InitializeSubscriptions(string locationForm)
         {
-            string result = "";
-            /*using (FileStream stream = new FileStream(locationForm, FileMode.Open))
+            using (FileStream stream = new FileStream(locationForm, FileMode.Open))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    Match match = Regex.Match(reader.ReadLine(), "(.*?) += (.*?);", RegexOptions.Singleline);
-                    for (int i = 1; i < match.Groups.Count; i += 2)
+                    while (!reader.EndOfStream)
                     {
-                        result += string.Concat(match.Groups[i].ToString(), " += ", match.Groups[i + 1].ToString(), ";\n");
+                        Match match = Regex.Match(reader.ReadLine(), @"(.*?) \+= (.*?);", RegexOptions.Singleline);
+                        if (match.Groups[1].ToString().Length > 0 && match.Groups[2].ToString().Length > 0)
+                        {
+                            subscriptions += string.Concat(match.Groups[1].ToString(), " += ", match.Groups[2].ToString(), ";\n");
+                        }
                     }
                 }
-            } */           
+            }
         }
 
         private void widthNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             int number;
-            if (int.TryParse(textBoxElement.Text, out number))
+            if (int.TryParse(widthNumericUpDown.Value.ToString(), out number))
             {
-                textBoxWidth.Text = numericUpDown1.Value.ToString();
-                ClientSize =  new Size(number, ClientSize.Height);
-            }            
+                textBoxWidth.Text = widthNumericUpDown.Value.ToString();
+                panel1.Size = new Size(number, panel1.Size.Height);
+                buildForm.ClientSize = new Size(number, panel1.Size.Height);
+            }
         }
 
         private void heightNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             int number;
-            if (int.TryParse(textBoxElement.Text, out number))
+            if (int.TryParse(heightNumericUpDown.Value.ToString(), out number))
             {
-                textBoxHeight.Text = numericUpDown1.Value.ToString();
-                ClientSize = new Size(ClientSize.Width, number);
+                textBoxHeight.Text = heightNumericUpDown.Value.ToString();
+                panel1.Size = new Size(panel1.Size.Width, number);
+                buildForm.ClientSize = new Size(panel1.Size.Width, number);
             }
         }
     }

@@ -21,3 +21,14 @@ C:\WinFormsDesigner-\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.csproj.
 C:\WinFormsDesigner-\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.csproj.CoreCompileInputs.cache
 C:\WinFormsDesigner-\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.exe
 C:\WinFormsDesigner-\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.pdb
+C:\WinFormsDesigner-main\WindowsFormsDesigner\bin\Debug\WindowsFormsDesigner.exe.config
+C:\WinFormsDesigner-main\WindowsFormsDesigner\bin\Debug\WindowsFormsDesigner.exe
+C:\WinFormsDesigner-main\WindowsFormsDesigner\bin\Debug\WindowsFormsDesigner.pdb
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.csproj.AssemblyReference.cache
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.BuildForm.resources
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.FormEditor.resources
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.Properties.Resources.resources
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.csproj.GenerateResource.cache
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.csproj.CoreCompileInputs.cache
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.exe
+C:\WinFormsDesigner-main\WindowsFormsDesigner\obj\Debug\WindowsFormsDesigner.pdb
